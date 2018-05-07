@@ -1,6 +1,6 @@
-install.packages("tableone")
-install.packages("Matching")
-install.packages("MatchIt")
+#install.packages("tableone")
+#install.packages("Matching")
+#install.packages("MatchIt")
 
 library(tableone)
 library(Matching)
@@ -115,7 +115,35 @@ set.seed(931139)
 
 
 match_cp1 <- Match(Tr=lalonde$treat, M=1, X=prop_score, replace = F, caliper = .1)
-summary(match)
+
+#6. How many matched pairs are there?
+summary(match_cp1)
+
+
+# 7. Use the matched data set (from propensity score matching with caliper=0.1) 
+# to carry out the outcome analysis.
+# 
+# For the matched data, what is the mean of real earnings in 1978 for treated 
+# subjects minus the mean of real earnings in 1978 for untreated subjects?
+
+
+# get indices of the matched records
+matched_treated_cp1 <- match_cp1$index.treated
+matched_control_cp1 <- match_cp1$index.control
+
+#subset original data
+lalonde_match_cp1 <- lalonde[c(matched_treated_cp1, matched_control_cp1),]
+
+
+re78_treat1_mcp1 <- lalonde_match_cp1[lalonde_match_cp1$treat==1, 're78']
+re78_treat0_mcp1 <- lalonde_match_cp1[lalonde_match_cp1$treat==0, 're78']
+mean(re78_treat1_mcp1) - mean(re78_treat0_mcp1)
+
+# get the difference between matched earnings in treatment & control 
+diffy <- re78_treat1_mcp1 - re78_treat0_mcp1
+
+#run a t-test to compare groups
+t.test(diffy)
 
 
   
